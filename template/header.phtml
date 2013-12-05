@@ -1,0 +1,73 @@
+<?php
+ include_once './classes/db_class.php';
+ $db_resource = new db();
+$em = (isset($_SESSION['email']) ? $_SESSION['email'] : "");
+$fetch = "select username,last_login  from admin_users where email='$em'"; // Retrieve data from database 
+$products = $db_resource->GetResultObj($fetch);
+
+if (count($products) > 0) {
+    $us = $products[0]->username;
+    $llog = $products[0]->last_login;
+}
+ /*login status and logout*/
+if (isset($_SESSION ['username'])) {
+    
+    $user_info = "Welcome, " . $us . "<a href=\"login.php?action=logout\">"." | "."<font color="."red".">"." Logout"."</font>"."</a>";
+    echo "<br>";
+if($_SESSION['last_login'] == '0000-00-00 00:00:00'){
+$log_info = "Last Login: New User";}
+else
+{
+ $log_info = "Last Login: " . date('jS M , g:i a', strtotime($_SESSION['last_login']));  
+}  
+} else {
+    $user_info = "Welcome Guest! <a href=\"login.php\"> Sign In!</a>";
+}
+ /*login status and logout*/
+?>
+
+
+<div id="kraus_header_wrapper">
+    <div id="kraus_header">
+        <div class="header-logo container" >
+            <div class="logo-img">
+                <a href="/"  ><img src="../images/kraus-logo.png" width="186" height="71" /> </a>
+            </div>
+            <div class="logo-text" >Price Defender</div>
+        </div>
+        <div class="menu-container container">
+            <div class="menu-item  first">  
+                <?php if (isset($_SESSION ['username'])) { ?>
+                    <a href="index.php"  class="top-menu-item-3"> Home </a>
+                <?php } ?>
+            </div>		
+            <div class="menu-item second" >
+                <?php if (isset($_SESSION ['username'])) { ?>
+                    <a href="mysettings.php" class="top-menu-item-3"> Settings</a>
+                <?php } ?>
+            </div>			
+            <div class="menu-item third" >  
+                <?php if (isset($_SESSION ['role']) && $_SESSION ['role'] === 'Admin') { ?>
+                    <a href="dealers.php" class="top-menu-item-3" > Dealers </a>
+                <?php } ?>
+            </div>
+
+            <div class="menu-item fourth">  
+                <?php if (isset($_SESSION ['role']) && $_SESSION ['role'] === 'Admin') { ?>
+                    <a href="users.php"  class="top-menu-item-3"> users </a>
+                <?php } ?>
+            </div>
+
+            <div class="user-container container" >
+                <div class="img-part"><img src="images/agent.png" width="28" height="24" /></div> 
+                <div class="text-part">  <?php echo $user_info;
+                if(isset($llog))
+                {
+                echo "<br>";
+                echo $log_info; //display date time of user
+                }
+                ?> </div> 
+            </div>
+        </div>
+    </div>
+</div>

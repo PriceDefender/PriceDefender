@@ -1,0 +1,243 @@
+<script type="text/javascript">
+
+/* Function removes search params to prevent overlay on other tab. Using for limit,pagination*/
+function check_for_search_params() {
+        if (queryParameters['tab'] != selected_tab) {
+            delete  queryParameters['action'];
+            delete queryParameters['field'];
+            delete queryParameters['value'];
+        }
+    }
+
+/*product_violation_tab.phtml*/
+function exporttop() {
+        var mode = $("#exportp").val();
+        queryParameters['tab'] = "violation-by-product";
+        if (mode)
+            open("export/export_product_" + mode + ".php?" + $.param(queryParameters));
+    }
+
+    /*Common search function*/
+    function search() {
+		
+		var action="search";
+		      
+        var value_sku = $('.'+selected_tab+' .search-sku').val();
+        var value_dealer = $('.'+selected_tab+' .search-dealer').val();
+		var date_from=$('.'+selected_tab+' #inputFieldfrom').val();
+     	var date_to=$('.'+selected_tab+' #inputFieldto').val();
+     	
+        var v_id = queryParameters['website_id'];
+        var p_id = queryParameters['product_id'];
+        queryParameters = {}; //clear parameters
+        queryParameters['tab'] = selected_tab;
+
+		if (date_from) {
+			 queryParameters['from'] = $.trim(date_from);
+		}
+		if (date_to) {
+			 queryParameters['to'] =  $.trim(date_to);
+		}
+        
+		if (value_sku) {
+			 queryParameters['sku'] = value_sku;
+//                          queryParameters['product_id'] = <?php // $product_id; ?>;
+		}
+
+		if (value_dealer) {
+			 queryParameters['dealer'] = value_dealer;
+		}
+		
+        if (value_sku || value_dealer) {
+            queryParameters['action'] = action;
+        }
+        if (v_id)
+            queryParameters['website_id'] = v_id;
+        if (p_id)
+            queryParameters['product_id'] = p_id;
+        
+        location.search = '?' + $.param(queryParameters);
+    }
+    /*Common search function*/
+
+    /*Show all common method*/
+    function show_all() {
+      
+     location.search='?tab='+selected_tab ;  	        
+    }
+    /*Show all common method*/
+
+    function show_all2() {
+        if (queryParameters['searchvendor']) {
+         
+                delete  queryParameters['searchvendor'];
+                delete  queryParameters['limit2'];
+               
+            }
+            if (queryParameters['searchproduct']) {
+         
+                delete  queryParameters['searchproduct'];
+                delete  queryParameters['limit2'];
+               
+            }
+       
+        if (queryParameters['page2']) {
+            delete queryParameters['page2'];
+        }
+        queryParameters['tab'] = selected_tab;
+        location.search = '?' + $.param(queryParameters);
+ }
+
+/*Limits functions*/
+    $(document).ready(function() {
+        $('.results-per-page').each(function() {
+            $(this).change(function() {
+                check_for_search_params();
+                var limit = $(this).val();
+                queryParameters['tab'] = selected_tab;
+                queryParameters['limit'] = limit;
+                location.search = '?' + $.param(queryParameters);
+            });
+        });
+
+        $('.results-per-page2').each(function() {
+            $(this).change(function() {
+                check_for_search_params();
+                var limit = $(this).val();
+                queryParameters['tab'] = selected_tab;
+                queryParameters['limit2'] = limit;
+                location.search = '?' + $.param(queryParameters);
+            });
+        });
+
+        /*Binding enter search*/
+        $(".recent_violation_search, .product-violation-search, .vendor-violation-search, .history_violation_search").keypress(function(e) {
+            if (e.which == 13) {
+                $(this).parent().parent().children('.search-btn-container').children('button').click();
+                $(this).parent().parent().children('.search-btn-container1').children('button').click();
+            }
+        });
+        /*Binding enter search*/
+
+        /*Binding enter search 2nd grids*/
+        $(".product-violation-search2, .vendor-violation-search2, .history-search2").keypress(function(e) {
+            if (e.which == 13) {
+                $(this).parent().parent().children('.search-btn-container').children('button').click();
+            }
+        });
+	
+        /*Binding enter search 2nd grids*/
+
+    });
+    /*Limits functions*/
+    /*Pagination function*/
+    function switch_page(page_num, param_name) {
+        check_for_search_params(); // to prevent search params in query
+        queryParameters['tab'] = selected_tab;
+        queryParameters[param_name] = page_num;
+        location.search = '?' + $.param(queryParameters);
+    }
+    /*Pagination function*/
+
+    /*Global sorting links*/
+    function sort_grid(field, direction, grid) {
+        check_for_search_params(); // to prevent search params from different tab in query
+        queryParameters['tab'] = selected_tab;
+        queryParameters['grid'] = grid;
+        queryParameters['dir'] = direction;
+        queryParameters['sort'] = field;
+        location.search = '?' + $.param(queryParameters);
+    }
+    /*Global sorting links*/
+    /*product_violation_tab.phtml*/
+ 
+    /* Select All Checkboxes common*/
+    function select_all_checkboxes(obj){        
+
+    var checked=1;
+    if ($(obj).prop("checked")) {
+    	checked=0; 
+    }
+
+	 if ($(obj).parent().parent().find("input[type=hidden]").val()==1) {  
+		$(obj).parent().parent().find("input[type=hidden]").val(0);
+		$(obj).parent().parent().find("input[type=hidden]").parent().children("a").html("Select All");
+	} 
+		
+   	 $(obj).parent().parent().parent().parent().parent().find("input[type=checkbox]").not('#'+$(obj).prop("id")).each(function() {  //up to GrayBlack   	   	  
+   	   	  
+         if (checked) {
+   	   	   	$(this).prop('checked', false);
+   	   	  } else {
+   	   	   	$(this).prop("checked", "checked");
+   	   	  }
+   	 });      
+    }      
+   /* Select All  Checkboxes common*/
+   /* Select All  Button common*/
+    function   select_all(obj){     
+         
+      if ( $(obj).parent().children("input").val()==1) {
+      	 if ($(obj).parent().parent().find("input[type=checkbox]").prop("checked"))
+    		 $(obj).parent().parent().find("input[type=checkbox]").click();
+   		 $(obj).parent().children("input").val(0);
+    	 $(obj).html("Select All");
+      } else {
+    	  if (!$(obj).parent().parent().find("input[type=checkbox]").prop("checked"))
+    		  $(obj).parent().parent().find("input[type=checkbox]").click();
+    	  $(obj).parent().children("input").val(1);
+    	  $(obj).html("Unselect All");
+      }
+     	 
+    }
+    /* Select All  Button common*/
+    /*New export function*/
+   function export2file(tab,type,grid_class, order_field,order_direction, DateFromId, DateToId) {
+	var all_from_page=0;
+	var selected_all=0;
+		 
+	selected_all=parseInt($("."+grid_class+" .select_all_value").val());
+	 if (selected_all) {		
+		 queryParameters['row_ids']="all";
+	 }else if (!selected_all && $("."+grid_class+" .select_all_value").parent().parent().find("input[type=checkbox]").prop("checked")) {
+		all_from_page=1;	
+		queryParameters['limit']=$(".limit-"+grid_class).val();	
+		queryParameters['row_ids']="limit"; 		 
+	}   else if (!selected_all && !all_from_page) {
+		var ids_array=[];
+		$("."+grid_class).find("input[type=checkbox]:checked").not('#'+$("."+grid_class+" .select_all_value").parent().parent().find("input[type=checkbox]").attr("id")).each(function() {
+			ids_array.push($(this).val());
+		});		 
+		queryParameters['row_ids']=ids_array.join(",");
+		if (ids_array.length==0) {
+			queryParameters['limit']=$(".limit-"+grid_class).val();	
+			queryParameters['row_ids']="limit"; 
+		}
+	} 
+
+	if (DateFromId.length && DateToId.length) {
+		queryParameters['from']=jQuery(DateFromId).val();
+		queryParameters['to']=jQuery(DateToId).val();
+	}
+	 
+	queryParameters['order_field']=order_field;
+	queryParameters['order_direction']=order_direction;
+	   open("export/export_"+tab+"_" + type + ".php?" + $.param(queryParameters));
+   }
+   /*New export function*/
+       
+ 
+//Second grid search
+function searchProDetail(){
+var venDetail = document.getElementById("txtproductDetail").value;
+ window.location ="index.php?tab=violations-history&"+ $.param(queryParameters)+"&searchvendor="+venDetail;
+ }
+ 
+
+ function searchVenDetail(){
+var proDetail = document.getElementById("txtvendorDetail").value;
+ window.location ="index.php?tab=violations-history&"+ $.param(queryParameters)+"&searchproduct="+proDetail;
+ }
+//Second grid search
+
+</script>
